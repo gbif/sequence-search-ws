@@ -1,16 +1,16 @@
 const _ = require('lodash');
-
+const config = require('../config_hbase.js')
 // const config = import('../config.mjs').HBASE;
 const thrift = require('thrift'),
   HBase = require('./gen-nodejs/HBase.js'),
   HBaseTypes = require('./gen-nodejs/Hbase_types.js');
  
-const config = {
+/* const config = {
     hosts: ['uc6n10.gbif.org', 'uc6n11.gbif.org', 'uc6n12.gbif.org' ], //["c4master1-vh.gbif.org", "c4master2-vh.gbif.org", "c3master3-vh.gbif.org"],
     port: 31995,
     tableName: 'blast_cache'
     
-  }; 
+  };  */
 
 let connection; 
 let client;
@@ -22,7 +22,7 @@ const connect = () =>{
      client = thrift.createClient(HBase,connection);
 
      connection.on('close', function(){ 
-        console.log("The connnection closed, reconnecting...")
+         //console.log("The connnection closed, reconnecting...")
          connect()
     })
     connection.on('connect', function() {

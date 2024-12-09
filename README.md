@@ -21,7 +21,7 @@ Clone this repository:
 
 cd in to the directory:
 
-`cd blast-ws`
+`cd sequence-search-ws`
 
 install dependencies:
 

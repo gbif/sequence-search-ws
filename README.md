@@ -18,7 +18,7 @@ Make a vsearch database:
 
 Clone this repository:
 
-`git clone https://github.com/thomasstjerne/sequence-search-ws.git`   
+`git clone https://github.com/gbif/sequence-search-ws.git`   
 
 cd in to the directory:
 

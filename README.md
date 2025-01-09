@@ -6,6 +6,7 @@ A thin rest service on top af vsearch.
 
 * Node version v20.10.0 or newer installed.
 * [vsearch installed](https://github.com/torognes/vsearch/releases), and a vsearch database created for querying
+* Write access to a directory defined in `BLAST_SEQ_PATH` in the config. Temporary fasta files will be written to this directory.
 
 ### Install
 

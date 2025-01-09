@@ -172,12 +172,18 @@ export const getFastaFromRequest = ({sequence, resultArray}) => {
     }).filter(s => !!s).join('\n')
 }
 
-
+export const getYargs = () =>  process.argv.reduce((acc, curr, idx) => {
+    if(curr?.startsWith('--')){
+      acc[curr.substring(2)] = process.argv[idx+1]
+    }
+    return acc
+   }, {})
 
 export default {
     sanitizeSequence,
     simplyfyMatch,
     getMatch,
     vsearchResultToJson,
-    getFastaFromRequest
+    getFastaFromRequest,
+    getYargs
 }

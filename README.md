@@ -33,6 +33,10 @@ install dependencies:
 
 `node app.mjs`
 
+You can use an external config file and/or specify which port to use:
+
+`node app.mjs --config path/to/config.json --port 9002`
+
 ### Usage
 
 `POST http://localhost:9002/search`

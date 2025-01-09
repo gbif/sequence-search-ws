@@ -1,6 +1,6 @@
 # sequence-search-ws
 
-A thin rest service on top af vsearch.
+A thin rest service on top af vsearch. New backend for the [sequence id tool](https://www.gbif.org/tools/sequence-id) and taxonomic annotation in installations of the [Metabarcoding Data Toolkit](https://mdt.gbif-test.org/).
 
 ### Requirements
 

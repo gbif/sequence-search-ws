@@ -41,14 +41,14 @@ const config = {
     NUM_THREADS: 8,
     MAX_QUEUED_JOBS: 10
   },
-  production: {
-    BLAST_SEQ_PATH: '/path/to/dir/for/temp/fastas',
-    BLAST_DATABASE_PATH: '/path/where/vsearch/databases/are',
-    EXPRESS_PORT: 80,
+  prod: {
+    BLAST_SEQ_PATH: './fastas/',
+    BLAST_DATABASE_PATH: './db/',
+    EXPRESS_PORT: 8080,
     MATCH_THRESHOLD,
     MATCH_CLOSE_THRESHOLD,
     CACHE_CONCURRENCY,
-    VSEARCH: "/path/to/vsearch/executable",
+    VSEARCH: "/usr/bin/vsearch",
     NUM_THREADS: 8,
     MAX_QUEUED_JOBS: 10
   }

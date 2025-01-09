@@ -12,13 +12,13 @@ A thin rest service on top af vsearch. New backend for the [sequence id tool](ht
 
 Download a reference dataset: https://unite.ut.ee/repository.php - choose the "General FASTA release"
 
-Make a vsearch database: 
+Make a vsearch database:
 
 `vsearch --makeudb_usearch sh_general_release_dynamic_s_all_25.07.2023.fasta --output sh_general_release_dynamic_s_all_25.07.2023.udb`
 
 Clone this repository:
 
-`git clone https://github.com/gbif/sequence-search-ws.git`   
+`git clone https://github.com/gbif/sequence-search-ws.git`
 
 cd in to the directory:
 
@@ -37,6 +37,18 @@ You can use an external config file and/or specify which port to use:
 
 `node app.mjs --config path/to/config.json --port 9002`
 
+### Docker install and run
+
+Download a reference dataset: https://unite.ut.ee/repository.php - choose the "General FASTA release" and place in `sequence-search-ws`.
+
+Build and run the docker image:
+
+```
+cd sequence-search-ws
+docker build --build-arg DATABASE_URL=file:///usr/local/gbif/sequence-search-ws/sh_general_release_04.04.2024.tgz -t sequence-search-ws .
+docker run --name sequence-search-ws -ti --rm -e NODE_ENV=prod --publish 8080:8080 sequence-search-ws
+```
+
 ### Usage
 
 `POST http://localhost:9002/search`
@@ -45,7 +57,7 @@ The body of your request should be a JSON object:
 
 ```javascript
 {
-  "database": "sh_general_release_dynamic_s_all_25.07.2023.udb", 
+  "database": "sh_general_release_dynamic_s_all_25.07.2023.udb",
   "sequence": ["TTAGAGGAAGTAAAAGTCGTAACAAGGTTTCCGTAGGTGAACCTGCGGAAGGATCATTATTGAAATAAACCT.......", "AGTCGTAACAAGGTTTCCGTAGGTGAACCTGCGGAAGGATC...."]
  }
 ```
@@ -53,7 +65,7 @@ The body of your request should be a JSON object:
 ### Example
 
 ```
-curl --header "Content-Type: application/json" \
+curl --silent --header "Content-Type: application/json" \
   --request POST \
   --data '{"sequence" : ["TTAGAGGAAGTAAAAGTCGTAACAAGGTTTCCGTAGGTGAACCTGCGGAAGGATCATTATTGAAATAAACCTGATGAGTTGTTGCTGGCTCTCTAGGGAGCATGTGCACACTTGTCATCTTTGTATCTTCACCTGTGCACCTTTTGTAGACCTTGGGTATCTATCTGATTGCTTTAGCACTCAGGATTGAGGATTGACTTCTTGTCTCTTCTTACATTTCCAGGTCTATGTTTCTTAATATACCCTAATGTATGTTTATAGAATGTAATTAATGGGCCTTTGTGCCTATAAATCTATACAACTTTCAGCAACGGATCTCTTGGCTCTCGCATCGATGAAGAACGCAGCGAAATGCGATAAGTAATGTGAATTGCAGAATTCAGTGAATCATCGAATCTTTGAACGCACCTTGCGCTCCTTGGTATTCCGAGGAGCATGCCTGTTTGAGTGTCATTAATATATCAACCTCTTTGGTTGGATGTGGGGGTTTGCTGGCCACTTGAGGTCAGCTCCTCTTAAATGCATTAGCGGACAACATTTTGCTAAACGTTCATTGGTGTGATAATTATCTACGCTCTTGACGTGAAGCAGGTTCAGCTTCTAACAGTCCATTGACTTGGATAAATTTTTTTCTATCAATGTGACCTCAAATCAGGTAGGACTACCCGCTGAACTTAAGCATATCAATAAGCGGAGGAAAAGAAACTAACAAGGATTCCCCTAGTAACTGCGAGTGAAGCGGGAAAAGCTCAAATTTAAAATCTGGCAGTCTTTGGCTGTCCGAGTTGTAATCTAGAGAAGCATTATCCGCGCTG"],
 	"database": "sh_general_release_dynamic_s_all_25.07.2023.udb"

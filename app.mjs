@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 import search from './search.mjs';
 import databases from './databases.mjs';
 import config from './config.mjs';
+import gbifServiceRegistry from './gbifServiceRegistry.js';
+
 const app = express();
 
 app.use(addRequestId());
@@ -16,6 +18,8 @@ search(app)
 const listener = app.listen(config.EXPRESS_PORT, function() {
     // console.log("Config "+config.INPUT_PATH )
      console.log('Express server listening on port ' + config.EXPRESS_PORT);
+          // Set up ZooKeeper.
+    gbifServiceRegistry.register(config);
  });
 
 // Exit on Ctrl-C
@@ -31,3 +35,5 @@ process.on('SIGTERM', () => {
         process.exit(0)
     })
 })
+
+

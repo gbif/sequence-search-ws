@@ -39,7 +39,11 @@ const config = {
     CACHE_CONCURRENCY,
     VSEARCH: "/Users/vgs417/vsearch-2.22.1-macos-aarch64/bin/vsearch",
     NUM_THREADS: 8,
-    MAX_QUEUED_JOBS: 10
+    MAX_QUEUED_JOBS: 10,
+    service: {
+      zkHost: '',
+      zkPath: '',
+    }
   },
   prod: {
     BLAST_SEQ_PATH: './fastas/',
@@ -50,7 +54,11 @@ const config = {
     CACHE_CONCURRENCY,
     VSEARCH: "/usr/bin/vsearch",
     NUM_THREADS: 8,
-    MAX_QUEUED_JOBS: 10
+    MAX_QUEUED_JOBS: 10,
+    service: {
+      zkHost: '',
+      zkPath: '',
+    }
   }
 };
 

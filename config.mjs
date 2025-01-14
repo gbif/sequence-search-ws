@@ -45,9 +45,9 @@ const config = {
       zkPath: '',
     }
   },
-  prod: {
-    BLAST_SEQ_PATH: './fastas/',
-    BLAST_DATABASE_PATH: './db/',
+  docker: {
+    BLAST_SEQ_PATH: '/srv/fastas/',
+    BLAST_DATABASE_PATH: '/srv/udb/',
     EXPRESS_PORT: 8080,
     MATCH_THRESHOLD,
     MATCH_CLOSE_THRESHOLD,

@@ -39,14 +39,16 @@ You can use an external config file and/or specify which port to use:
 
 ### Docker install and run
 
-Download a reference dataset: https://unite.ut.ee/repository.php - choose the "General FASTA release" and place in `sequence-search-ws`.
+Download a reference dataset and create a vsearch database as above.
+
+Create a configuration file in ./conf.
 
 Build and run the docker image:
 
 ```
 cd sequence-search-ws
-docker build --build-arg DATABASE_URL=file:///usr/local/gbif/sequence-search-ws/sh_general_release_04.04.2024.tgz -t sequence-search-ws .
-docker run --name sequence-search-ws -ti --rm -e NODE_ENV=prod --publish 8080:8080 sequence-search-ws
+docker build -t sequence-search-ws .
+docker run --name sequence-search-ws -ti --rm --volume $PWD/conf:/usr/local/gbif/conf --volume $PWD/data:/srv --publish 8080:8080 sequence-search-ws
 ```
 
 ### Usage

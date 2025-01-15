@@ -17,4 +17,4 @@ VOLUME /srv
 VOLUME /usr/local/gbif/conf
 
 EXPOSE 8080
-CMD ["/usr/local/bin/node", "app.mjs", "--config", "/usr/local/gbif/conf/config.js"]
+CMD ["/usr/local/bin/node", "app.mjs", "--config", "/usr/local/gbif/conf/server.js"]

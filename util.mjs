@@ -25,8 +25,8 @@ const simplyfyMatch = (match, bestIdentity) => {
     const simpleMatch = {
         'name': match['scientificName'].replace(/_/g, ' '), // white space is not allowed in fasta headers and usually replaced with _
         'identity': Number(match['identity']),
-/*         'appliedScientificName': splitted[0],
- */     'alignmentLength' :  Number(match?.alignmentLength || 0),// Number(match['alignment length']),
+         'appliedScientificName': match['appliedScientificName'],
+      'alignmentLength' :  Number(match?.alignmentLength || 0),// Number(match['alignment length']),
         'misMatches':  Number(match['mismatches']),
         'gapOpenings':  Number(match['opens']),
        'matchType': getMatchType(match),
@@ -93,6 +93,7 @@ export const vsearchResultToJson = (data) => {
                     const parts = splitted[i].split('|')
                     res.accession = parts?.[1] || "";
                     res.scientificName = parts?.[2] || "";
+                    res.appliedScientificName = parts?.[0] || "";
                 }
             }
             return res;

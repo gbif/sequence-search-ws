@@ -3,7 +3,7 @@ import config from "./config.mjs";
 import {getFastaFromRequest} from "./util.mjs"
 import { spawn } from 'child_process';
 
-export const runVsearch = ({ reqId, sequence, database, resultArray, outformat }) =>
+export const runVsearch = ({ reqId, sequence, database, resultArray, outformat, identity }) =>
     new Promise(async (resolve, reject) => {
       try {
            const queryFile = config.BLAST_SEQ_PATH + `${reqId}.fasta`;
@@ -19,7 +19,7 @@ export const runVsearch = ({ reqId, sequence, database, resultArray, outformat }
           "--db",
           `${config.BLAST_DATABASE_PATH}${database}`,
           "--id",
-          0.90,
+          (!isNaN(Number(identity)) ? (Number(identity)/100) : 0.90),
           "--query_cov",
           0.5,
            outformat === "blast6out"  ?  "--blast6out" : "--alnout",
@@ -34,7 +34,7 @@ export const runVsearch = ({ reqId, sequence, database, resultArray, outformat }
           config.NUM_THREADS,
           "--quiet"
         ];
-  
+        console.log(config.VSEARCH +" " + params.join(" "));
         let pcs = spawn(config.VSEARCH, params, { stdio: ["pipe", "pipe", 0] });
       
         let string = "";

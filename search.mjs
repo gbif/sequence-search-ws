@@ -35,14 +35,14 @@ const getCachedResults = async ({sequence, resultArray, database}) => {
 }
 const search = async (req, res) => {
   try {
-    let {sequence, database, verbose} = req?.body;
-    const {outformat} = req.query
+    let {sequence, database, outformat, identity, verbose} = req?.body;
+    //const {outformat, identity, verbose} = req.query
     if(!_.isArray(sequence)){
       sequence = [sequence]
     }
     let resultArray = Array(sequence.length);
 
-    if(cache){
+    if(cache && !req?.query?.identity){
         try {
             resultArray =  await getCachedResults({sequence, resultArray, database })
         } catch (error) {
@@ -60,9 +60,9 @@ const search = async (req, res) => {
     } else if( queue.size > config.MAX_QUEUED_JOBS){
       res.sendStatus(503)
     } else {
-    const vsearchCliOutput = await queue.add(() => runVsearch({sequence, database, reqId: req.id, resultArray, outformat}))
+    const vsearchCliOutput = await queue.add(() => runVsearch({sequence, database, reqId: req.id, resultArray, outformat, identity}))
     const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(vsearchCliOutput) : vsearchResultToJsonWithAligment(vsearchCliOutput) ;
-   
+
     const grouped = _.groupBy(vsearchJson, "query id")
 
     

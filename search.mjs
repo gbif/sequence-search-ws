@@ -42,7 +42,7 @@ const search = async (req, res) => {
     }
     let resultArray = Array(sequence.length);
 
-    if(cache && !req?.query?.identity){
+    if(cache && !identity){
         try {
             resultArray =  await getCachedResults({sequence, resultArray, database })
         } catch (error) {

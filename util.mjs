@@ -144,8 +144,8 @@ export const vsearchResultToJsonWithAligment = (data) => {
                         "identity": Number(cols[0]?.replace("%", "") || 0),
                         "target length": Number(cols[1]),
                         "alignment": alignment?.alignment,
-                        "identity": alignment?.identity,
-                        "alignmentLength": alignment?.alignmentLength,
+                        "identity": Number(alignment?.identity),
+                        "alignmentLength": Number(alignment?.alignmentLength),
                         "accession" : parts?.[1] || "",
                         "scientificName" : parts?.[2] || ""
                     });

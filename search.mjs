@@ -92,7 +92,31 @@ const search = async (req, res) => {
   }
 };
 
+const vsearchServer = async (req, res) => {
+  const {sequence, outformat} = req.query;
+  if(!config.VSEARCH_SERVER){
+    res.sendStatus(501)
+    return
+  }
+  if(!sequence){
+    res.sendStatus(400)
+    return
+  }
+  try {
+    // use fetch to get the data from the vsearch server
+    const response = await fetch(`${config.VSEARCH_SERVER}?sequence=${sequence}&outformat=${outformat}`);
+    const data = await response.text();
+    const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(data) : vsearchResultToJsonWithAligment(data) ;
+    res.json(vsearchJson);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+
+}
+
 export default (app) => {
   app.post("/search", search);
   app.post("/search/batch", search);
+  app.get("/vsearch-server", vsearchServer);
 };

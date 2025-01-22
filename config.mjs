@@ -43,7 +43,8 @@ const config = {
     service: {
       zkHost: '',
       zkPath: '',
-    }
+    },
+    VSEARCH_SERVER: "http://0.0.0.0:8000/search"
   },
   docker: {
     BLAST_SEQ_PATH: '/srv/fastas/',
@@ -58,7 +59,8 @@ const config = {
     service: {
       zkHost: '',
       zkPath: '',
-    }
+    },
+    VSEARCH_SERVER: "http://0.0.0.0:8000/search"
   }
 };
 

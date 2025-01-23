@@ -7,7 +7,7 @@ import {runVsearch} from "./vsearch.mjs"
 import _ from "lodash"
 const queue = new PQueue({ concurrency: 1 });
 const limit = pLimit(config.CACHE_CONCURRENCY);
-
+const vsearchServerLimit = pLimit(1);
 const cache = null;
  
 
@@ -102,7 +102,20 @@ const vsearchServer = async (req, res) => {
     res.sendStatus(400)
     return
   }
-  try {
+  // use limit to always only have 1 request to the vsearch server
+  vsearchServerLimit(
+    () => fetch(`${config.VSEARCH_SERVER}?sequence=${sequence}&outformat=${outformat}`)
+    .then(response => response.text())
+    .then(data => {
+      const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(data) : vsearchResultToJsonWithAligment(data) ;
+      res.json(vsearchJson);
+    })
+    .catch(error => {
+      console.log(error);
+      res.sendStatus(500);
+    })
+  )
+/*   try {
     // use fetch to get the data from the vsearch server
     const response = await fetch(`${config.VSEARCH_SERVER}?sequence=${sequence}&outformat=${outformat}`);
     const data = await response.text();
@@ -111,7 +124,7 @@ const vsearchServer = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
-  }
+  } */
 
 }
 

@@ -2,7 +2,7 @@ import PQueue from "p-queue";
 import pLimit from "p-limit";
 import config from "./config.mjs";
 // import cache from "./caches/hbase.js"; // Could be null if no cache is needed
-import { vsearchResultToJsonWithAligment, vsearchResultToJson, getMatch} from "./util.mjs"
+import { vsearchResultToJsonWithAligment, vsearchResultToJson, getMatch, sanitizeSequence} from "./util.mjs"
 import {runVsearch} from "./vsearch.mjs"
 import _ from "lodash"
 const queue = new PQueue({ concurrency: 1 });
@@ -60,8 +60,9 @@ const search = async (req, res) => {
     } else if( queue.size > config.MAX_QUEUED_JOBS){
       res.sendStatus(503)
     } else {
-    const vsearchCliOutput = await queue.add(() => runVsearch({sequence, database, reqId: req.id, resultArray, outformat, identity}))
-    const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(vsearchCliOutput) : vsearchResultToJsonWithAligment(vsearchCliOutput) ;
+    const sanitizedSequences = sequence.map(s => sanitizeSequence(s))
+    const vsearchCliOutput = await queue.add(() => runVsearch({sequence: sanitizedSequences, database, reqId: req.id, resultArray, outformat, identity}))
+    const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(vsearchCliOutput, sanitizedSequences) : vsearchResultToJsonWithAligment(vsearchCliOutput, sanitizedSequences) ;
 
     const grouped = _.groupBy(vsearchJson, "query id")
 

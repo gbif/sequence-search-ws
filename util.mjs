@@ -2,7 +2,7 @@ import config from './config.mjs';
 import _ from 'lodash';
 const vsearchColumns = ['query id', 'target header', 'identity', 'alignmentLength', 'mismatches', 'opens', 'qstart',  'qend', 'sstart', 'send', 'evalue', 'bit score'];
 
-const sanitizeSequence = (sequence) => {
+export const sanitizeSequence = (sequence) => {
     const sanitized = sequence.replace(/[^ACGTURYSWKMBDHVNacgturyswkmbdhvn]/g, '');
     return sanitized
 }
@@ -23,13 +23,14 @@ const simplyfyMatch = (match, bestIdentity) => {
   // let splitted = match['subject id'].split('|');
   //  let accesion = splitted[1];
     const simpleMatch = {
-        'name': match['scientificName'].replace(/_/g, ' '), // white space is not allowed in fasta headers and usually replaced with _
+/*         'queryId': match['query id'],
+ */     'name': match['scientificName'].replace(/_/g, ' '), // white space is not allowed in fasta headers and usually replaced with _
         'identity': Number(match['identity']),
-         'appliedScientificName': match['appliedScientificName'],
-      'alignmentLength' :  Number(match?.alignmentLength || 0),// Number(match['alignment length']),
+        'appliedScientificName': match['appliedScientificName'],
+        'alignmentLength' :  Number(match?.alignmentLength || 0),// Number(match['alignment length']),
         'misMatches':  Number(match['mismatches']),
         'gapOpenings':  Number(match['opens']),
-       'matchType': getMatchType(match),
+        'matchType': getMatchType(match),
         'bitScore': Number(match['bit score']),
         'expectValue': Number(match['evalue']),
        /*  'querySequence': match['query sequence'],
@@ -38,8 +39,8 @@ const simplyfyMatch = (match, bestIdentity) => {
         'qend': Number(match['qend']),
         'sstart': Number(match['sstart']),
         'send': Number(match['send']),
-/*         'qcovs': Number(match['% query cover']),
- */        'distanceToBestMatch': bestIdentity - Number(match['identity']),
+        'qcovs': match?.['qcovs'] || -1,
+        'distanceToBestMatch': bestIdentity - Number(match['identity']),
         'accession': match.accession || ''
     };
     if(match?.alignment){
@@ -81,7 +82,7 @@ export const getMatch = (matches, verbose) => {
     }
 }
 
-export const vsearchResultToJson = (data) => {
+export const vsearchResultToJson = (data, sequence) => {
     if (data) {
         let matches = data.split('\n').filter(m => !!m);
         let json = matches.map(function(m) {
@@ -96,6 +97,14 @@ export const vsearchResultToJson = (data) => {
                     res.appliedScientificName = parts?.[0] || "";
                 }
             }
+            try {
+                const queryId = Number(splitted[0]);
+                const queryLength = sequence[queryId].length;
+                res['qcovs'] = Math.round(((Number(res['alignmentLength']) / queryLength) * 100) * 10) / 10 ;
+                
+            } catch (error) {
+                  console.log(error)
+            }           
             return res;
         });
        // console.log(json);
@@ -107,7 +116,7 @@ export const vsearchResultToJson = (data) => {
 
 }
 
-export const vsearchResultToJsonWithAligment = (data) => {
+export const vsearchResultToJsonWithAligment = (data, sequence) => {
     if (data) {
        // console.log(data)
         const blocks = data.split("Query >")
@@ -136,9 +145,10 @@ export const vsearchResultToJsonWithAligment = (data) => {
                     const parts = cols[2].split('|')
                 
                 const alignment = alignments[cols[2]] 
+
                 // Vsearch will return 100% matches on series of "N". Make sure that at least half of the alignment is exact matches marked with the | character. 
                 if(alignment?.alignmentLength && (alignment?.numExactBaseMatches / alignment?.alignmentLength > 0.5)){
-                    result.push( {
+                    const res =  {
                         "query id": matchesOverviewLines[0],
                         "target id": cols[2],
                         "identity": Number(cols[0]?.replace("%", "") || 0),
@@ -148,7 +158,16 @@ export const vsearchResultToJsonWithAligment = (data) => {
                         "alignmentLength": Number(alignment?.alignmentLength),
                         "accession" : parts?.[1] || "",
                         "scientificName" : parts?.[2] || ""
-                    });
+                    }
+                    try {
+                        const queryId = Number(res['query id']);
+                        const queryLength = sequence[queryId].length;
+                        res['qcovs'] = Math.round(((Number(res['alignmentLength']) / queryLength) * 100) * 10) / 10 ;
+                    } catch (error) {
+                        console.log(error)
+                    }
+                    
+                    result.push( res);
                 }
                }
                
@@ -169,7 +188,7 @@ export const getFastaFromRequest = ({sequence, resultArray}) => {
     const data = typeof sequence === 'string' ? [sequence] : sequence;
 
     return data.map((s, idx) => {
-        return   !_.get(resultArray, `[${idx}]`) ? `>${idx}\n${sanitizeSequence(s)}` : '';
+        return   !_.get(resultArray, `[${idx}]`) ? `>${idx}\n${s}` : '';
     }).filter(s => !!s).join('\n')
 }
 

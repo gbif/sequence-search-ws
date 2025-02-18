@@ -103,12 +103,13 @@ const vsearchServer = async (req, res) => {
     res.sendStatus(400)
     return
   }
+  const sanitizedSequence = sanitizeSequence(sequence);
   // use limit to always only have 1 request to the vsearch server
   vsearchServerLimit(
-    () => fetch(`${config.VSEARCH_SERVER}?sequence=${sequence}&outformat=${outformat}`)
+    () => fetch(`${config.VSEARCH_SERVER}?sequence=${sanitizedSequence}&outfmt=${outformat}`)
     .then(response => response.text())
     .then(data => {
-      const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(data) : vsearchResultToJsonWithAligment(data) ;
+      const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(data, {search: sanitizedSequence}) : vsearchResultToJsonWithAligment(data, {search: sanitizedSequence}) ;
       res.json(vsearchJson);
     })
     .catch(error => {

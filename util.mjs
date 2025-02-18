@@ -98,7 +98,7 @@ export const vsearchResultToJson = (data, sequence) => {
                 }
             }
             try {
-                const queryId = Number(splitted[0]);
+                const queryId = !isNaN( Number(splitted[0])) ?  Number(splitted[0]) : splitted[0];
                 const queryLength = sequence[queryId].length;
                 res['qcovs'] = Math.round(((Number(res['alignmentLength']) / queryLength) * 100) * 10) / 10 ;
                 
@@ -160,7 +160,7 @@ export const vsearchResultToJsonWithAligment = (data, sequence) => {
                         "scientificName" : parts?.[2] || ""
                     }
                     try {
-                        const queryId = Number(res['query id']);
+                        const queryId = !isNaN(Number(res['query id'])) ? Number(res['query id']) : res['query id'];
                         const queryLength = sequence[queryId].length;
                         res['qcovs'] = Math.round(((Number(res['alignmentLength']) / queryLength) * 100) * 10) / 10 ;
                     } catch (error) {

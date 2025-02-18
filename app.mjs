@@ -5,8 +5,10 @@ import search from './search.mjs';
 import databases from './databases.mjs';
 import config from './config.mjs';
 import gbifServiceRegistry from './gbifServiceRegistry.js';
+import cors from 'cors'
 
 const app = express();
+app.use(cors())
 
 app.use(addRequestId());
 app.use(bodyParser.json({

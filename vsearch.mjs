@@ -3,8 +3,23 @@ import config from "./config.mjs";
 import {getFastaFromRequest} from "./util.mjs"
 import { spawn } from 'child_process';
 
-export const runVsearch = ({ reqId, sequence, database, resultArray, outformat, identity }) =>
+export const runVsearch = ({ reqId, sequence, database, resultArray, outformat, identity, signal }) =>
     new Promise(async (resolve, reject) => {
+      let resolved = false
+      let pcs;
+      if (signal ) {
+        signal.addEventListener('abort', () => {
+          if (!resolved && typeof pcs.kill === 'function') {
+            // console.log(`${reqId} aborting vsearch process`);
+            pcs.kill('SIGTERM');
+          } 
+           if (!resolved) {
+            // console.log(`${reqId} aborting vsearch promise`);
+            reject(new Error(`Aborted by client`));
+           }
+            
+        });
+      } 
       try {
            const queryFile = config.BLAST_SEQ_PATH + `${reqId}.fasta`;
         await fs.promises.writeFile(
@@ -34,12 +49,13 @@ export const runVsearch = ({ reqId, sequence, database, resultArray, outformat, 
           config.NUM_THREADS,
           "--quiet"
         ];
-        console.log(config.VSEARCH +" " + params.join(" "));
-        let pcs = spawn(config.VSEARCH, params, { stdio: ["pipe", "pipe", 0] });
+       // console.log(config.VSEARCH +" " + params.join(" "));
+         pcs = spawn(config.VSEARCH, params, { stdio: ["pipe", "pipe", 0] });
       
         let string = "";
   
         pcs.on("error", function (e) {
+          console.log('VSEARCH process error: ');
           console.log(e);
           reject(e);
         });
@@ -51,11 +67,14 @@ export const runVsearch = ({ reqId, sequence, database, resultArray, outformat, 
   
           pcs.stdout.on("end", function () {
             resolve(string);
+            resolved = true;
             pcs.stdout.destroy();
+
             fs.unlink(queryFile, function(e1) {
               if (e1) {
                   console.log('Failed to remove seq file: ' + queryFile);
               }
+              
           }); 
           });
         }

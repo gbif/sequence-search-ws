@@ -35,6 +35,13 @@ const getCachedResults = async ({sequence, resultArray, database}) => {
 }
 const search = async (req, res) => {
   try {
+    const controller = new AbortController();
+    const signal = controller.signal; 
+
+    res.on('close', () => {
+        //console.log(`Request aborted by the client: ${req.id}`);
+        controller.abort();
+    });
     let {sequence, database, outformat, identity, verbose} = req?.body;
     //const {outformat, identity, verbose} = req.query
     if(!_.isArray(sequence)){
@@ -61,7 +68,7 @@ const search = async (req, res) => {
       res.sendStatus(503)
     } else {
     const sanitizedSequences = sequence.map(s => sanitizeSequence(s))
-    const vsearchCliOutput = await queue.add(() => runVsearch({sequence: sanitizedSequences, database, reqId: req.id, resultArray, outformat, identity}))
+    const vsearchCliOutput = await queue.add(() => runVsearch({sequence: sanitizedSequences, database, reqId: req.id, resultArray, outformat, identity, signal}))
     const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(vsearchCliOutput, sanitizedSequences) : vsearchResultToJsonWithAligment(vsearchCliOutput, sanitizedSequences) ;
 
     const grouped = _.groupBy(vsearchJson, "query id")
@@ -88,8 +95,13 @@ const search = async (req, res) => {
     }
     
   } catch (error) {
-    console.log(error)
-    res.sendStatus(500)
+    if (error.message.includes('Aborted by client')) {
+       res.sendStatus(400)
+    } else {
+      console.log(error.message)
+      res.sendStatus(500)
+    }
+
   }
 };
 
@@ -117,16 +129,6 @@ const vsearchServer = async (req, res) => {
       res.sendStatus(500);
     })
   )
-/*   try {
-    // use fetch to get the data from the vsearch server
-    const response = await fetch(`${config.VSEARCH_SERVER}?sequence=${sequence}&outformat=${outformat}`);
-    const data = await response.text();
-    const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(data) : vsearchResultToJsonWithAligment(data) ;
-    res.json(vsearchJson);
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
-  } */
 
 }
 

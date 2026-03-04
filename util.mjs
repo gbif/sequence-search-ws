@@ -183,6 +183,9 @@ export const vsearchResultToJsonWithAligment = (data, sequence) => {
 
 }
 
+export const sortByIdentity = (a, b) => {
+    return b.identity !== a.identity ? (Number(b.identity) || 0) - (Number(a.identity) || 0) : (Number(b.qcovs) || 0) - (Number(a.qcovs) || 0)
+}
 
 export const getFastaFromRequest = ({sequence, resultArray}) => {
     const data = typeof sequence === 'string' ? [sequence] : sequence;

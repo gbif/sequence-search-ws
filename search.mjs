@@ -2,7 +2,7 @@ import PQueue from "p-queue";
 import pLimit from "p-limit";
 import config from "./config.mjs";
 // import cache from "./caches/hbase.js"; // Could be null if no cache is needed
-import { vsearchResultToJsonWithAligment, vsearchResultToJson, getMatch, sanitizeSequence} from "./util.mjs"
+import { vsearchResultToJsonWithAligment, vsearchResultToJson, getMatch, sanitizeSequence, sortByIdentity} from "./util.mjs"
 import {runVsearch} from "./vsearch.mjs"
 import _ from "lodash"
 const queue = new PQueue({ concurrency: 1 });
@@ -107,7 +107,7 @@ const search = async (req, res) => {
 
 const vsearchServer = async (req, res) => {
   const {sequence, outformat} = req.query;
-  if(!config.VSEARCH_SERVER){
+  if(!config.VSEARCH_SERVER || config.VSEARCH_SERVER.length === 0){
     res.sendStatus(501)
     return
   }
@@ -117,19 +117,18 @@ const vsearchServer = async (req, res) => {
   }
   const sanitizedSequence = sanitizeSequence(sequence);
   // use limit to always only have 1 request to the vsearch server
-  vsearchServerLimit(
-    () => fetch(`${config.VSEARCH_SERVER}?sequence=${sanitizedSequence}&outfmt=${outformat}`)
-    .then(response => response.text())
-    .then(data => {
-      const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(data, {search: sanitizedSequence}) : vsearchResultToJsonWithAligment(data, {search: sanitizedSequence}) ;
-      res.json(vsearchJson);
-    })
-    .catch(error => {
-      console.log(error);
-      res.sendStatus(500);
-    })
+   vsearchServerLimit(
+   () => Promise.allSettled(
+    config.VSEARCH_SERVER.map( serverUrl => 
+      fetch(`${serverUrl}?sequence=${sanitizedSequence}&outfmt=${outformat}`).then(response => response.text())
   )
-
+).then(results => {
+    const fulfilled = results.filter(r => r.status === 'fulfilled').map(r => r.value);
+    const failed = results.filter(r => r.status === 'rejected');
+    const result = [...fulfilled.map(data => outformat === 'blast6out' ? vsearchResultToJson(data, {search: sanitizedSequence}) : vsearchResultToJsonWithAligment(data, {search: sanitizedSequence}) )].flat();
+    res.json(result.sort(sortByIdentity));
+}))
+  
 }
 
 export default (app) => {

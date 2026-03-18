@@ -11,7 +11,7 @@ RUN curl -LSs https://github.com/torognes/vsearch/releases/download/v$VSEARCH_VE
 # Compile sequence-search-ws
 COPY . /usr/local/gbif/sequence-search-ws
 WORKDIR /usr/local/gbif/sequence-search-ws
-RUN npm install --registry https://repository-mirror.gbif.org/content/repositories/npmjs/
+RUN npm install --registry https://repository-mirror.gbif.org/repository/npmjs/
 
 VOLUME /srv
 VOLUME /usr/local/gbif/conf

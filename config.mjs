@@ -44,7 +44,7 @@ const config = {
       zkHost: '',
       zkPath: '',
     },
-    VSEARCH_SERVER: "http://0.0.0.0:8000/search"
+    VSEARCH_SERVER: "https://vsearch.gbif.org/search"
   },
   docker: {
     BLAST_SEQ_PATH: '/srv/fastas/',
@@ -60,7 +60,7 @@ const config = {
       zkHost: '',
       zkPath: '',
     },
-    VSEARCH_SERVER: "http://0.0.0.0:8000/search"
+    VSEARCH_SERVER: "https://vsearch.gbif.org/search"
   }
 };
 

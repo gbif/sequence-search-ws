@@ -2,14 +2,15 @@ import PQueue from "p-queue";
 import pLimit from "p-limit";
 import config from "./config.mjs";
 // import cache from "./caches/hbase.js"; // Could be null if no cache is needed
-import { vsearchResultToJsonWithAligment, vsearchResultToJson, getMatch, sanitizeSequence} from "./util.mjs"
+import VsearchParser from "vsearch-parser"
 import {runVsearch} from "./vsearch.mjs"
 import _ from "lodash"
 const queue = new PQueue({ concurrency: 1 });
 const limit = pLimit(config.CACHE_CONCURRENCY);
 const vsearchServerLimit = pLimit(1);
 const cache = null;
- 
+
+const {sanitizeSequence, getMatch, vsearchResultToJson, vsearchResultToJsonWithAligment} = new VsearchParser(config)
 
 const getCachedResults = async ({sequence, resultArray, database}) => {
     try {
@@ -69,6 +70,7 @@ const search = async (req, res) => {
     } else {
     const sanitizedSequences = sequence.map(s => sanitizeSequence(s))
     const vsearchCliOutput = await queue.add(() => runVsearch({sequence: sanitizedSequences, database, reqId: req.id, resultArray, outformat, identity, signal}))
+  
     const vsearchJson = outformat === 'blast6out' ? vsearchResultToJson(vsearchCliOutput, sanitizedSequences) : vsearchResultToJsonWithAligment(vsearchCliOutput, sanitizedSequences) ;
 
     const grouped = _.groupBy(vsearchJson, "query id")

@@ -9,6 +9,7 @@
     "p-queue": "^8.0.1",
     "quick-local-ip": "^1.0.7",
     "thrift": "^0.21.0",
+    "vsearch-parser": "github:thomasstjerne/vsearch-parser",
     "yaml": "^2.6.1",
     "zookeeper": "^6.2.3"
   }
